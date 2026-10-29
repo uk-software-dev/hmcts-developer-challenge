@@ -1,0 +1,256 @@
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% extends "template.njk" %}
+{% block content %}
+  {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+
+  {{ govukBreadcrumbs({
+    items: [
+      {
+        text: "Home",
+        href: "#"
+      },
+      {
+        text: "Case Details",
+        href: "/"
+      },
+      {
+        text: "Case Related Tasks",
+        href: "#"
+      }
+    ]
+  }) }}
+
+  {% if isCreateNew %}
+    <h1 class='govuk-heading-xl'>Create New Task</h1>
+  {% elif isEditingStatus %}
+    <h1 class='govuk-heading-xl'>Edit Task Details</h1>
+  {% else %}
+    <h1 class='govuk-heading-xl'>Task Details</h1>
+  {% endif %}
+
+  {% call govukDetails({
+      summaryText: "Development Note"
+    })
+  %}
+    Would check create rights on the server and also consider concurrent users and handling two users changing the same
+    record.
+    <br />
+    The Edit Status enables the status field and checks it is not blank
+    <br />
+    Delete record is a 'quick delete'. In a finished system this should check the users right to delete on the server
+    and also confirm deletion with the user via a 'are you sure' dialog.
+    <br />
+    Create new record checks fields are not blank and the due date is in the future. Authorisation to create new tasks
+    should be checked. Some users may just be able to view tasks and edit the status.
+  {% endcall %}
+
+  <form id='save-task-form' action='/task/save/{{ taskData.id }}' method='post'>
+    {% call govukInsetText() %}
+      {% if not isCreateNew %}
+        Details for Task:
+        {{ taskData.id }}
+        {{ taskData.title }}
+        <br />
+      {% endif %}
+      {% if isCreateNew %}
+        Please complete all fields and click the save button to create a new task for this case
+      {% elif isEditingStatus %}
+        To discard your changes click the cancel button below
+      {% else %}
+        To edit the status for this task click the button below
+      {% endif %}
+      <br />
+      <br />
+
+      <div style='display: flex; gap: 15px; align-items: flex-start;'>
+
+        <div style='width: 250px;'>
+          <a class='govuk-button govuk-!-width-full' href='/'>Load Parent Case</a>
+        </div>
+
+        {% if not isCreateNew %}
+          <div style='width: 160px;'>
+            {% if isEditingStatus %}
+              <button
+                class='govuk-button govuk-button--secondary govuk-!-width-full'
+                type='submit'
+                formaction='/task/{{ taskData.id }}/editStatus/{{ isEditingStatus }}'
+                formmethod='post'
+              >Cancel Edit</button>
+            {% else %}
+              <button
+                class='govuk-button govuk-!-width-full'
+                type='submit'
+                formaction='/task/{{ taskData.id }}/editStatus/{{ isEditingStatus }}'
+                formmethod='post'
+              >Edit Status</button>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if isEditingStatus or isCreateNew %}
+          <div style='width: 160px;'>
+            <button class='govuk-button govuk-!-width-full' type='submit'>Save</button>
+          </div>
+        {% endif %}
+
+        {% if not isCreateNew %}
+          <div style='width: 160px;'>
+            <button
+              class='govuk-button govuk-button--warning govuk-!-width-full'
+              type='submit'
+              formaction='/task/{{ taskData.id }}/delete'
+              formmethod='get'
+            >Delete</button>
+          </div>
+        {% endif %}
+
+      </div>
+    {% endcall %}
+
+    {% if not isCreateNew %}
+      {{ govukInput({
+        label: {
+          text: "Task Id"
+        },
+        id: "txtTaskId",
+        name: "TaskId",
+        value: taskData.id,
+        attributes: {
+          readonly: "readonly"
+        }
+      }) }}
+    {% endif %}
+
+    {{ govukInput({
+      label: {
+        text: "Title"
+      },
+      id: "txtTitle",
+      name: "txtTitle",
+      errorMessage: {
+        text: validationErrors.title
+      } if validationErrors.title else null,
+      value: taskData.title,
+      attributes: {
+        readonly: "readonly"
+      } if not isCreateNew else{
+      }
+    }) }}
+    {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+    {{ govukSelect({
+      id: "selectStatus",
+      name: "selectStatus",
+      errorMessage: {
+        text: validationErrors.status
+      } if validationErrors.status else null,
+      label: {
+        text: "Task Status"
+      },
+      items: [
+        {
+          value: "",
+          text: "",
+          selected: true if taskData.statusCode == "" else false
+        },
+        {
+          value: "0001",
+          text: "Not Started",
+          selected: true if taskData.statusCode == "0001" else false
+        },
+        {
+          value: "0002",
+          text: "In Progress",
+          selected: true if taskData.statusCode == "0002" else false
+        },
+        {
+          value: "0003",
+          text: "On hold",
+          selected: true if taskData.statusCode == "0003" else false
+        },
+        {
+          value: "0004",
+          text: "Complete",
+          selected: true if taskData.statusCode == "0004" else false
+        }
+      ],
+      disabled: not isEditingStatus
+    }) }}
+
+    {{ govukTextarea({
+      name: "txtTaskDescription",
+      errorMessage: {
+        text: validationErrors.description
+      } if validationErrors.description else null,
+      id: "txtTaskDescription",
+      label: {
+        text: "Task Description"
+      },
+      hint: {
+        text: "This should explain what you need to do to complete this task"
+      },
+      value: taskData.description,
+      attributes: {
+        readonly: "readonly"
+      } if not isCreateNew else{
+      }
+    }) }}
+
+    {{ govukDateInput({
+      id: "dateDueDate",
+      namePrefix: "dateDueDate",
+      errorMessage: {
+        text: validationErrors.dueDate
+      } if validationErrors.dueDate else null,
+      fieldset: {
+        legend: {
+          text: "Due Date"
+        }
+      },
+      hint: {
+        text: "This is when this task should be completed by"
+      },
+      items: [
+        {
+          name: "day",
+          classes: "govuk-input--width-2",
+          value: taskData.dueDateDay,
+          attributes: {
+            readonly: "readonly"
+          }if not isCreateNew else{
+          }
+        },
+        {
+          name: "month",
+          classes: "govuk-input--width-2",
+          value: taskData.dueDateMonth,
+          attributes: {
+            readonly: "readonly"
+          }if not isCreateNew else{
+          }
+        },
+        {
+          name: "year",
+          classes: "govuk-input--width-4",
+          value: taskData.dueDateYear,
+          attributes: {
+            readonly: "readonly"
+          }if not isCreateNew else{
+          }
+        }
+      ]
+    }) }}
+  </form>
+
+  {{ govukBackLink({
+    text: "Back",
+    href: "/"
+  }) }}
+{% endblock %}

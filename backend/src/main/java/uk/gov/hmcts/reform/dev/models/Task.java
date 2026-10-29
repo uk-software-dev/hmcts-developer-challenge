@@ -1,0 +1,35 @@
+package uk.gov.hmcts.reform.dev.models;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class Task {
+
+    private int id;
+    private int caseId;
+    private String title;
+    private String description;
+    private String statusCode;
+    private String status;
+    private LocalDateTime dueDate;
+    private int dueDateDay;
+    private int dueDateMonth;
+    private int dueDateYear;
+
+    public String getLocalDate() {
+        if (dueDate == null) {
+            return "";
+        }
+
+        return dueDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+}
