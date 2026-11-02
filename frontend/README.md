@@ -14,3 +14,20 @@ To begin with, you should be able to run this by running:
 3. `yarn start:dev` or navigate to package.json and run the script manually
 
 You can change the structure however you like!
+
+## Tests
+
+Run commands from the `frontend` directory:
+
+```bash
+yarn test:unit
+yarn test:routes
+```
+
+The unit tests use Jest. Route tests exercise the Express app and mock backend requests where needed. Current route
+coverage includes the case home page, the blank task form at `GET /task`, task listing, opening, creation and
+validation, status updates, and deletion. Functional browser tests can be run with:
+
+```bash
+yarn test:functional
+```

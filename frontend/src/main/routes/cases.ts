@@ -53,6 +53,24 @@ export default function (app: Application): void {
         }
     });
 
+    app.get('/task', (req, res) => {
+        const blankTask = {
+            id: '',
+            caseId: '1',
+            title: '',
+            description: '',
+            statusCode: '',
+            status: '',
+            dueDate: ''
+        };
+
+        res.render('task', {
+            taskData: blankTask,
+            isEditingStatus: true,
+            isCreateNew: true
+        });
+    });
+
     // From the case create a new task
     app.post('/tasks/create', async (req, res) => {
         try {

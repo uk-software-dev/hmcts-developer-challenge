@@ -2,7 +2,6 @@ import { app } from '../../main/app';
 
 import request from 'supertest';
 
-// TODO: replace this sample test with proper route tests for your application
 /* eslint-disable jest/expect-expect */
 describe('Home page', () => {
   describe('on GET', () => {
@@ -12,8 +11,11 @@ describe('Home page', () => {
   });
 
   describe('task page', () => {
-    test('should respond to the task redirect destination', async () => {
-      await request(app).get('/task').expect(200);
+    test('should render a blank task form', async () => {
+      const response = await request(app).get('/task').expect(200);
+
+      expect(response.text).toContain('Create New Task');
+      expect(response.text).toContain('Title');
     });
   });
 });
