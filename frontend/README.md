@@ -31,3 +31,7 @@ validation, status updates, and deletion. Functional browser tests can be run wi
 ```bash
 yarn test:functional
 ```
+
+The functional tests use Playwright and expect the frontend development server to be running at
+`http://localhost:3100` (the default `TEST_URL`). Start it in another terminal with `yarn start:dev`, or set
+`TEST_URL` to the URL of an already-running frontend.

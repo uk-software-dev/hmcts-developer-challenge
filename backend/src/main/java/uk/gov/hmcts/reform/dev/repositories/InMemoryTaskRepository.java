@@ -10,11 +10,13 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import uk.gov.hmcts.reform.dev.models.Task;
 
 @Repository
+@ConditionalOnProperty(name = "app.task-repository", havingValue = "memory", matchIfMissing = true)
 public class InMemoryTaskRepository implements TaskRepository {
     private final Map<Integer, Task> tasks = new ConcurrentHashMap<>();
     private final AtomicInteger nextId = new AtomicInteger(1);

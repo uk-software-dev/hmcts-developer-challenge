@@ -26,6 +26,13 @@ spring:
     import: "optional:configtree:/mnt/secrets/test/"
   application:
     name: Dev Test
+
+app:
+  # Valid values: memory (default) or sqlite.
+  task-repository: ${TASK_REPOSITORY:memory}
+  sqlite:
+    path: ${TASK_SQLITE_PATH:./data/tasks.db}
+
 #  datasource:
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}

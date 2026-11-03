@@ -114,6 +114,7 @@ describe('Task and case routes', () => {
       .expect(response => {
         expect(response.text).toContain('Create New Task');
         expect(response.text).toContain('Title');
+        expect(response.text).toContain("action='/task/save'");
       });
 
     expect(axios.get).not.toHaveBeenCalled();
@@ -137,9 +138,49 @@ describe('Task and case routes', () => {
         expect(response.text).toContain('Enter a description for this task');
         expect(response.text).toContain('Select a status for this task');
         expect(response.text).toContain('Enter a valid calendar date');
+        expect(response.text).toContain("action='/task/save'");
       });
 
     expect(axios.post).not.toHaveBeenCalled();
+  });
+
+  test('correcting an invalid due date allows the task to be created', async () => {
+    const taskForm = {
+      txtTitle: 'Prepare hearing bundle',
+      txtTaskDescription: 'Collect the documents for the hearing',
+      selectStatus: '0002',
+      'dateDueDate-day': '31',
+      'dateDueDate-month': '2',
+      'dateDueDate-year': '2027',
+    };
+
+    await request(app)
+      .post('/task/save')
+      .type('form')
+      .send(taskForm)
+      .expect(200)
+      .expect(response => {
+        expect(response.text).toContain('Enter a valid calendar date');
+        expect(response.text).toContain("action='/task/save'");
+      });
+
+    jest.mocked(axios.post).mockResolvedValueOnce(axiosResponse({ ...task, id: 35 }));
+
+    await request(app)
+      .post('/task/save')
+      .type('form')
+      .send({
+        ...taskForm,
+        'dateDueDate-day': '15',
+        'dateDueDate-month': '1',
+      })
+      .expect(302)
+      .expect('Location', '/task/35/open');
+
+    expect(axios.post).toHaveBeenCalledWith(
+      'http://localhost:4000/save-task',
+      expect.objectContaining({ dueDate: '2027-01-15T00:00:00' })
+    );
   });
 
   test('POST /task/save creates a valid task and redirects to it', async () => {
