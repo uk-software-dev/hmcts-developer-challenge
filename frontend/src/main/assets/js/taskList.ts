@@ -2,7 +2,7 @@ import MOJFrontend from '@ministryofjustice/frontend';
 
 async function loadTasks(): Promise<void> {
   try {
-    const response = await fetch('/get-tasks');
+    const response = await fetch('tasks/list');
 
     if (!response.ok) {
       throw new Error('Failed to load tasks');

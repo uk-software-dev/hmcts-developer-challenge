@@ -18,6 +18,24 @@
       "autoAttachChildProcesses": true,
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Frontend route tests",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["test:routes"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Frontend unit tests",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["test:unit"],
+      "console": "integratedTerminal"
     }
   ]
 }

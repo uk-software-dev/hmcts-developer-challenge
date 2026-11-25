@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backend unit tests",
+      "type": "shell",
+      "command": "./gradlew test",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "group": "test"
+    },
+    {
+      "label": "Backend integration tests",
+      "type": "shell",
+      "command": "./gradlew integration",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "group": "test"
+    }
+  ]
+}
